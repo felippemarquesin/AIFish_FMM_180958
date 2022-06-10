@@ -7,6 +7,7 @@ public class Flock : MonoBehaviour
     //Declara a variavel do Manager e a da velocidade dos peixer
     public FlockingManager myManager;
     float speed;
+    bool turning = false;
 
     private void Start()
     {
@@ -16,6 +17,36 @@ public class Flock : MonoBehaviour
 
     private void Update()
     {
+        Bounds b = new Bounds(myManager.transform.position,myManager.swinLimits * 2);
+
+        RaycastHit hit = new RaycastHit();
+        Vector3 direction = myManager.transform.position - transform.position;
+
+        if (!b.Contains(transform.position))
+        {
+            turning = true;
+            direction = myManager.transform.position - transform.position;
+        }else if(Physics.Raycast(transform.position, this.transform.forward * 50, out hit))
+        {
+            turning = true;
+            direction = Vector3.Reflect(this.transform.forward, hit.normal);
+        }
+        else
+        {
+            turning = false;
+            if (turning)
+            {
+                transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(direction), myManager.rotationSpeed * Time.deltaTime);
+            }
+            else
+            {
+                if (Random.Range(0, 100) < 10) speed = Random.Range(myManager.minSpeed, myManager.maxSpeed);
+                if (Random.Range(0, 100) < 20) applyRules();
+            }
+            transform.Translate(0, 0, Time.deltaTime * speed);
+        }
+
+
         //Chama o metodo ApplyRules
         applyRules();
 
@@ -68,7 +99,7 @@ public class Flock : MonoBehaviour
         if(groupSize > 0)
         {
             //Divide o valor de vcentre pelo tamanho do grupo
-            vcentre = vcentre / groupSize;
+            vcentre = vcentre / groupSize + (myManager.goalPos - this.transform.position);
             //e defini o speed como o gspeed dividido pelo tamanho do grupo
             speed = gSpeed / groupSize;
 

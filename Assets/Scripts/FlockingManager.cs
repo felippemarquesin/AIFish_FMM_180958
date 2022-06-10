@@ -9,6 +9,7 @@ public class FlockingManager : MonoBehaviour
     public int numFish = 20;
     public GameObject[] allFish;
     public Vector3 swinLimits = new Vector3(5, 5, 5);
+    public Vector3 goalPos;
 
     //Declara a variavel da velocidade minima e maxima do peixe, a distancia dos peixes e a velocidade da rotação deles
     [Header("Configurações do Cardume")]
@@ -27,12 +28,20 @@ public class FlockingManager : MonoBehaviour
         for(int i = 0; i < numFish; i++)
         {
             //Defini uma posicao aleatoria dentro dos parametros antes definido
-            Vector3 pos =  this.transform.position + new Vector3(Random.Range(-swinLimits.x,swinLimits.x), 
-                Random.Range(-swinLimits.y, swinLimits.y), Random.Range(-swinLimits.z,swinLimits.z));
+            Vector3 pos =  this.transform.position + new Vector3(Random.Range(-swinLimits.x,swinLimits.x), Random.Range(-swinLimits.y, swinLimits.y), Random.Range(-swinLimits.z,swinLimits.z));
 
             //Instancia os peixes de acordo com o numero no array
             allFish[i] = (GameObject)Instantiate(fishPrefab, pos, Quaternion.identity);
             allFish[i].GetComponent<Flock>().myManager = this;
         }
+        goalPos = this.transform.position;
     }
+
+    private void Update()
+    {
+        goalPos = this.transform.position;
+        if (Random.Range(0, 100) < 10)
+            goalPos = this.transform.position + new Vector3(Random.Range(-swinLimits.x, swinLimits.x), Random.Range(-swinLimits.y, swinLimits.y), Random.Range(-swinLimits.z, swinLimits.z));
+    }
+
 }
